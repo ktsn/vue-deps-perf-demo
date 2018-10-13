@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Current</title>
+
+  <style>
+    #buttons {
+      width: 120px;
+      display: inline-block;
+      position: absolute;
+    }
+
+    button {
+      display: block;
+      margin: 5px;
+      width: 100px;
+    }
+
+    #list-table {
+      position: relative;
+      left: 120px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="buttons">
+      <button id="test" style="background-color: green">
+        Test
+      </button>
+
+      <div id="result"></div>
+    </div>
+
+    <div id="list-table" v-if="showList">
+      <list-row v-for="i in 1000" v-bind:key="i" />
+    </div>
+  </div>
+
+  <script src="vue-dev.js"></script>
+  <script>
+    const numListItems = 1000;
+
+    const store = new Vue({
+      data() {
+        var listItems = []
+        for (var i = 0; i < numListItems; i += 1) {
+          listItems.push({
+            id: i,
+            name: "listItem - " + i
+          })
+        }
+        return {
+          listItems
+        }
+      },
+
+      computed: {
+        computedValue() {
+          return this.listItems
+        }
+      }
+    });
+
+    Vue.component('list-row', {
+      template: "<div>{{value}}</div>",
+      computed: {
+        value() {
+          return store.computedValue[0].name
+        }
+      }
+    });
+
+    const app = new Vue({
+      el: '#list-table',
+      data() {
+        return {
+          showList: true
+        }
+      },
+      beforeUpdate() {
+        this._start = performance.now()
+      },
+      updated() {
+        const end = performance.now()
+        const result = end - this._start
+        $('#result').textContent = 'Update Time: ' + result + 'ms'
+      }
+    });
+
+    const $ = document.querySelector.bind(document)
+    $('#test').addEventListener('click', () => {
+      app.showList = false
+    })
+  </script>
+</body>
+
+</html>
